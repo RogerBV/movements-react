@@ -1,0 +1,46 @@
+version: '3'
+services:
+  database:
+    image: mysql:8
+    environment:
+      MYSQL_USER: root,
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: dbmovements
+      MYSQL_ALLOW_EMPTY_PASSWORD: 0
+    networks:
+      - networkdev
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  backend:
+    build:
+      context: ../movements-restapi  # The path to the directory containing your backend application
+    ports:
+      - "3001:3001"  # Map port 4000 on your host to port 4000 on the container
+    depends_on:
+      - database  # Make sure the database container is started before the backend
+    environment:
+      - NODE_ENV=development  # Set environment variables as needed
+      - DB_HOST=database  # Use the service name of the database container
+      - DB_PORT=3306  # The default MySQL port
+      - DB_USER=root
+      - DB_PASSWORD=123456
+      - DB_NAME=dbmovements  # Specify your database name
+    networks:
+      - networkdev  # Use the same network name as defined in the frontend's docker-compose
+  frontend:
+    build:
+      context: . # Path to your frontend project
+    ports:
+      - "5173:5173" # Map the container port to host port
+    depends_on:
+      - backend # Ensure the backend service is started before the frontend
+    networks:
+      - networkdev
+    volumes:
+      - ./movements-react:/movements-react
+      - ./node_modules:/movements-react:/node_modules
+networks:
+  networkdev:
+volumes:
+  node_modules:
