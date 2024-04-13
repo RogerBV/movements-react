@@ -7,13 +7,11 @@ function BalancesScreen() {
     const [selectedCard, setSelectedCard] = useState<number>(0);
 
     const getBalancesByCardId = async() => {
-        console.log('Selected Card: '+ selectedCard);
         const objParams = {
             cardId: selectedCard
         }
 
         const balanceList = await getJsonFromGet('getBalances', objParams);
-        console.log(balanceList);
         setBalances(balanceList);
     }
 
